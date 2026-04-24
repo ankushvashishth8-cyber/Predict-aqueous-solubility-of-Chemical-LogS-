@@ -18,13 +18,13 @@ def load_engines():
 model_gen, model_spec = load_engines()
 
 # --- 3. Sidebar & UI ---
-st.sidebar.header("🔬 V3.0 Dual-Engine Controls")
+st.sidebar.header("🔬 V3.1 Extreme Precision Controls")
 temp = st.sidebar.slider("Temperature (°C)", 0, 100, 25)
 
-st.title("🧪 Smart Chemical Solubility Dashboard 3.0")
-st.markdown("**Experimental Dual-Engine Logic:** Using Fingerprints + LogP + MolWt for Zone A Precision.")
+st.title("🧪 Smart Chemical Solubility Dashboard 3.1")
+st.markdown("**Experimental Dual-Engine Logic:** Fingerprints + LogP + MolWt + H-Bonding for maximum accuracy.")
 
-smiles_input = st.text_input("Enter SMILES String:", "CCCCCCCCCCCCCCCC") # Hexadecane default
+smiles_input = st.text_input("Enter SMILES String:", "CCCCCCCCCCCCCCCC") 
 
 # --- 4. Prediction Logic ---
 if st.button("Run Deep Analysis", type="primary"):
@@ -34,30 +34,29 @@ if st.button("Run Deep Analysis", type="primary"):
         with col1:
             st.image(Draw.MolToImage(mol, size=(400, 300)), caption="Molecular Structure")
 
-       # --- V3.1 Updated Feature Extraction ---
-fp = np.array(AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024))
-logp = Descriptors.MolLogP(mol)
-molwt = Descriptors.MolWt(mol)
-tpsa = Descriptors.TPSA(mol)
-h_donors = Descriptors.NumHDonors(mol) # 🟢 Naya Feature
-h_acceptors = Descriptors.NumHAcceptors(mol) # 🟢 Naya Feature
+        # 🟢 CORRECTED INDENTATION (V3.1 Features inside 'if mol:')
+        fp = np.array(AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024))
+        logp = Descriptors.MolLogP(mol)
+        molwt = Descriptors.MolWt(mol)
+        tpsa = Descriptors.TPSA(mol)
+        h_donors = Descriptors.NumHDonors(mol)
+        h_acceptors = Descriptors.NumHAcceptors(mol)
 
-# Ab total 1029 features combine honge
-features = np.concatenate((fp, [logp, molwt, tpsa, h_donors, h_acceptors])).reshape(1, -1)
+        # Combine all features
+        features = np.concatenate((fp, [logp, molwt, tpsa, h_donors, h_acceptors])).reshape(1, -1)
+        
         # STEP 1: General Engine Prediction
-raw_val = model_gen.predict(features)[0]
+        raw_val = model_gen.predict(features)[0]
         
         final_val = raw_val
         zone_label = ""
         is_specialist_used = False
 
-        # STEP 2: Logic Switch
+        # STEP 2: Logic Switch for Zone A
         if raw_val < -6:
-            # Switch to Specialist Engine 2
             is_specialist_used = True
             final_val = model_spec.predict(features)[0]
             
-            # Micro-Stratification
             if -7 <= final_val < -6: zone_label = "Zone A1 (Very Low)"
             elif -8 <= final_val < -7: zone_label = "Zone A2 (Extreme Low)"
             elif -9 <= final_val < -8: zone_label = "Zone A3 (Ultra Low)"
@@ -78,11 +77,12 @@ raw_val = model_gen.predict(features)[0]
 
             with st.expander("📝 Technical QA Audit"):
                 st.write(f"- **Engine 1 Raw:** `{raw_val:.3f}`")
-                st.write(f"- **Engine 2 Corrected:** `{final_val:.3f}`")
+                st.write(f"- **Engine 2 Specialist Value:** `{final_val:.3f}`")
                 st.write(f"- **LogP (Oil Affinity):** `{logp:.2f}`")
                 st.write(f"- **Molecular Weight:** `{molwt:.2f}`")
+                st.write(f"- **H-Donors/Acceptors:** `{h_donors}/{h_acceptors}`")
 
     else:
         st.error("❌ Invalid SMILES")
 
-st.caption("Developed by Ankush | V3.0 Dual-Engine System")
+st.caption("Developed by Ankush | V3.1 Dual-Engine High-Precision System")

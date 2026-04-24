@@ -45,7 +45,7 @@ h_acceptors = Descriptors.NumHAcceptors(mol) # 🟢 Naya Feature
 # Ab total 1029 features combine honge
 features = np.concatenate((fp, [logp, molwt, tpsa, h_donors, h_acceptors])).reshape(1, -1)
         # STEP 1: General Engine Prediction
-        raw_val = model_gen.predict(features)[0]
+raw_val = model_gen.predict(features)[0]
         
         final_val = raw_val
         zone_label = ""
